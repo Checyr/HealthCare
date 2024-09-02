@@ -2,12 +2,39 @@ package com.gabrielly.healthcare;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.gabrielly.healthcare.databinding.ActivityMainBinding;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements SensorEventListener {
+
+    private SensorManager sensorManager;
+    private TextView txtaccelerometerX;
+    private TextView txtaccelerometerY;
+    private Float accelerometerX;
+    private Float accelerometerY;
+    private Float accelerometerZ;
+
+
+    private TextView txtstepcounter;
+    private int stepcount;
+
+    // peak magnitude
+    private static final float STEP_THRESHOLD = 9.0f;
+
+    private static final int STEP_DELAY_NS = 250000000; // 0.25 seconds
+
+    // armazena o valor do ultimo passo
+    private long lastStepTime = 0;
+
 
     // Used to load the 'healthcare' library on application startup.
     static {
@@ -20,17 +47,120 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        binding = ActivityMainBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
+        setContentView(R.layout.activity_main);
 
-        // Example of a call to a native method
-        TextView tv = binding.sampleText;
-        tv.setText(stringFromJNI());
+        Button btn_add = findViewById(R.id.btn_add);
+
+        // Set an OnClickListener to call the native method
+        btn_add.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onButtonClick();
+            }
+        });
+
+
+        txtaccelerometerX = findViewById(R.id.accelerometerX);
+        txtaccelerometerY = findViewById(R.id.accelerometerY);
+
+
+        txtstepcounter = findViewById(R.id.txt_step_count);
+
+
+        setupSensorStuff();
+
+    }
+
+    // configuração do acelerometro
+    private void setupSensorStuff() {
+        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+
+        Sensor accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+
+        if(accelerometer != null){
+            sensorManager.registerListener(this,
+                    accelerometer,
+                    SensorManager.SENSOR_DELAY_NORMAL,
+                    SensorManager.SENSOR_DELAY_NORMAL
+            );
+        }
     }
 
     /**
      * A native method that is implemented by the 'healthcare' native library,
      * which is packaged with this application.
      */
-    public native String stringFromJNI();
+    public native Void onButtonClick();
+
+    @Override
+    public void onSensorChanged(SensorEvent sensorEvent) {
+        if (sensorEvent.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+            float sidesY = sensorEvent.values[0]; // Y
+            float upDownX = sensorEvent.values[1]; // X
+            float latitudeZ = sensorEvent.values[2]; // Z
+
+            accelerometerX = upDownX; //turn the smartphone upsidedown and you will see
+            accelerometerY = sidesY; //turn the smartphone upsidedown and you will see
+            accelerometerZ = latitudeZ; //turn the smartphone upsidedown and you will see
+
+            String stepCountStringX = Float.toString(accelerometerX);
+            String stepCountStringY = Float.toString(accelerometerY);
+            txtaccelerometerX.setText(stepCountStringX);
+            txtaccelerometerY.setText(stepCountStringY);
+
+            // chamar a função magnitude agora que as variaveis estao com valores
+            magnitude(accelerometerX,accelerometerY,accelerometerZ);
+        }
+
+    }
+
+    public Float getAccelerometerX() {
+        return accelerometerX;
+    }
+
+    public Float getAccelerometerY() {
+        return accelerometerY;
+    }
+
+    public Float getAccelerometerZ() {
+        return accelerometerZ;
+    }
+
+
+
+    // magnitude e contador de passos
+    private void magnitude(float x,float y,float z) {
+
+        float magnitude = (float)Math.sqrt(x * x + y * y + z * z);
+
+        //dectar os picos
+
+        if (magnitude < STEP_THRESHOLD) {
+            long currentTime = System.nanoTime();
+            if (currentTime - lastStepTime > STEP_DELAY_NS){
+                lastStepTime = currentTime;
+                onStepcounter();
+            }
+        }
+    }
+
+
+    // aumentar contador de passo
+    private void onStepcounter() {
+        stepcount = stepcount + 1;
+
+        String Str_step_count = Integer.toString(stepcount);
+
+        txtstepcounter.setText(Str_step_count);
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int i) {
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
 }
