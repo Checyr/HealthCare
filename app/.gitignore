@@ -2,7 +2,11 @@
 *.apk
 *.ap_
 
-app/release
+app/release/
+
+
+
+
 .settings/
 .settings/org.eclipse.buildship.core.prefs
 
