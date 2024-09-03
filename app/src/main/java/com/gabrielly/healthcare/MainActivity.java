@@ -28,7 +28,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private int stepcount;
 
     // peak magnitude
-    private static final float STEP_THRESHOLD = 9.0f;
+    private static final float STEP_THRESHOLD = 8.0f;
 
     private static final int STEP_DELAY_NS = 250000000; // 0.25 seconds
 
@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
 
         txtstepcounter = findViewById(R.id.txt_step_count);
-
+        txtstepcounter.setText("0");
 
         setupSensorStuff();
 
@@ -80,8 +80,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         if(accelerometer != null){
             sensorManager.registerListener(this,
                     accelerometer,
-                    SensorManager.SENSOR_DELAY_NORMAL,
-                    SensorManager.SENSOR_DELAY_NORMAL
+                    SensorManager.SENSOR_DELAY_FASTEST,
+                    SensorManager.SENSOR_DELAY_FASTEST
             );
         }
     }
@@ -95,12 +95,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
         if (sensorEvent.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-            float sidesY = sensorEvent.values[0]; // Y
-            float upDownX = sensorEvent.values[1]; // X
+            float sidesX = sensorEvent.values[0]; // X
+            float upDownY = sensorEvent.values[1]; // Y
             float latitudeZ = sensorEvent.values[2]; // Z
 
-            accelerometerX = upDownX; //turn the smartphone upsidedown and you will see
-            accelerometerY = sidesY; //turn the smartphone upsidedown and you will see
+            accelerometerY = upDownY; //turn the smartphone upsidedown and you will see
+            accelerometerX = sidesX; //turn the smartphone upsidedown and you will see
             accelerometerZ = latitudeZ; //turn the smartphone upsidedown and you will see
 
             String stepCountStringX = Float.toString(accelerometerX);
