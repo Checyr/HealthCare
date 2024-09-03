@@ -19,6 +19,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private SensorManager sensorManager;
     private TextView txtaccelerometerX;
     private TextView txtaccelerometerY;
+    private TextView txtaccelerometerZ;
+
+
     private Float accelerometerX;
     private Float accelerometerY;
     private Float accelerometerZ;
@@ -62,6 +65,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         txtaccelerometerX = findViewById(R.id.accelerometerX);
         txtaccelerometerY = findViewById(R.id.accelerometerY);
+        txtaccelerometerZ = findViewById(R.id.accelerometerZ);
 
 
         txtstepcounter = findViewById(R.id.txt_step_count);
@@ -105,8 +109,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
             String stepCountStringX = Float.toString(accelerometerX);
             String stepCountStringY = Float.toString(accelerometerY);
+            String stepCountStringZ = Float.toString(accelerometerZ);
+
             txtaccelerometerX.setText(stepCountStringX);
             txtaccelerometerY.setText(stepCountStringY);
+            txtaccelerometerZ.setText(stepCountStringZ);
 
             // chamar a função magnitude agora que as variaveis estao com valores
             magnitude(accelerometerX,accelerometerY,accelerometerZ);
