@@ -2,6 +2,7 @@ package com.gabrielly.healthcare;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.NotificationManager;
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -10,6 +11,7 @@ import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.gabrielly.healthcare.databinding.ActivityMainBinding;
@@ -28,6 +30,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
 
     private TextView txtstepcounter;
+    private ProgressBar circularProgress;
     private int stepcount;
 
     // peak magnitude
@@ -39,11 +42,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private long lastStepTime = 0;
 
 
-    // Used to load the 'healthcare' library on application startup.
-    static {
-        System.loadLibrary("healthcare");
-    }
-
     private ActivityMainBinding binding;
 
     @Override
@@ -52,24 +50,15 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         setContentView(R.layout.activity_main);
 
-        Button btn_add = findViewById(R.id.btn_add);
-
-        // Set an OnClickListener to call the native method
-        btn_add.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onButtonClick();
-            }
-        });
-
-
-        txtaccelerometerX = findViewById(R.id.accelerometerX);
+        /*txtaccelerometerX = findViewById(R.id.accelerometerX);
         txtaccelerometerY = findViewById(R.id.accelerometerY);
-        txtaccelerometerZ = findViewById(R.id.accelerometerZ);
+        txtaccelerometerZ = findViewById(R.id.accelerometerZ);*/
+
+        circularProgress = findViewById(R.id.circularProgress);
 
 
         txtstepcounter = findViewById(R.id.txt_step_count);
-        txtstepcounter.setText("0");
+        txtstepcounter.setText("0 Passos");
 
         setupSensorStuff();
 
@@ -94,7 +83,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
      * A native method that is implemented by the 'healthcare' native library,
      * which is packaged with this application.
      */
-    public native Void onButtonClick();
 
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
@@ -107,13 +95,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             accelerometerX = sidesX; //turn the smartphone upsidedown and you will see
             accelerometerZ = latitudeZ; //turn the smartphone upsidedown and you will see
 
-            String stepCountStringX = Float.toString(accelerometerX);
+           /* String stepCountStringX = Float.toString(accelerometerX);
             String stepCountStringY = Float.toString(accelerometerY);
             String stepCountStringZ = Float.toString(accelerometerZ);
 
             txtaccelerometerX.setText(stepCountStringX);
             txtaccelerometerY.setText(stepCountStringY);
-            txtaccelerometerZ.setText(stepCountStringZ);
+            txtaccelerometerZ.setText(stepCountStringZ);*/
 
             // chamar a função magnitude agora que as variaveis estao com valores
             magnitude(accelerometerX,accelerometerY,accelerometerZ);
@@ -158,7 +146,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         String Str_step_count = Integer.toString(stepcount);
 
-        txtstepcounter.setText(Str_step_count);
+        txtstepcounter.setText(Str_step_count + " Passos");
+        if (stepcount > 6000) {
+            circularProgress.setProgress(600); // Clamp to max
+        } else {
+            circularProgress.setProgress(stepcount*2);
+        }
     }
 
     @Override
@@ -170,4 +163,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     protected void onDestroy() {
         super.onDestroy();
     }
+
+
 }

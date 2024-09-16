@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Background Circle (gray track) -->
+    <item>
+        <shape
+            android:shape="ring"
+            android:thickness="10dp"
+            android:useLevel="false">
+            <solid android:color="#D3D3D3" /> <!-- Gray background -->
+        </shape>
+    </item>
+
+    <!-- Progress Circle (colored track) -->
+    <item>
+        <rotate
+            android:fromDegrees="260"
+            android:toDegrees="180">
+            <shape
+                android:shape="ring"
+                android:thickness="10dp"
+                android:useLevel="true">
+                <solid android:color="#24d19b" /> <!-- Teal progress color -->
+            </shape>
+        </rotate>
+    </item>
+</layer-list>
